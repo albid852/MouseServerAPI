@@ -1,5 +1,6 @@
 import websockets
 import asyncio
+from functools import partial
 from mouseController import MouseController
 
 
@@ -32,11 +33,12 @@ class MainServer:
 
     def run(self):
         async_runner = asyncio.get_event_loop().run_until_complete
+        partial_get_motion = partial(self._get_motion)
 
         # can't use self in functions below for handlers, need a workaround....
         async_runner(websockets.serve(self._get_click, self.host, self.click_port))
         async_runner(websockets.serve(_get_scroll, self.host, self.scroll_port))
-        async_runner(websockets.serve(self._get_motion, self.host, self.motion_port))
+        async_runner(websockets.serve(partial_get_motion, self.host, self.motion_port))
         async_runner(websockets.serve(_get_command, self.host, self.command_port))
 
         asyncio.get_event_loop().run_forever()

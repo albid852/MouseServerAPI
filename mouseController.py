@@ -10,12 +10,12 @@ def decode_vector(vec: str) -> dict:
 
 
 def calculate_dr(a, dt, v):
-    if abs(a['x']) < 0.5 and abs(a['y']) < 0.5:
-        return {'dx': 0, 'dy': 0}
-    vf = {'x': a['x'] * dt + v['x'], 'y': a['y'] * dt + v['x']}
-    dr = {'dx': vf['x'] * dt, 'dy': vf['y'] * dt}
-    v['x'] = vf['x']
-    v['y'] = vf['y']
+    # vf = {'x': a['x'] * dt + v['x'], 'y': a['y'] * dt + v['x']}
+    dr = {'dx': a['x'] * dt * dt, 'dy': a['y'] * dt * dt}
+
+    # dr = {'dx': vf['x'] * dt, 'dy': vf['y'] * dt}
+    # v['x'] = vf['x']
+    # v['y'] = vf['y']
     return dr
 
 
@@ -72,6 +72,13 @@ class MouseController:
 
     def move(self, accel):
         a = decode_vector(accel)
+        if abs(a['x']) < 0.05 and abs(a['y']) < 0.05:
+            return
+        # print(accel)
         dr = calculate_dr(a, self.dt, self.v)
-        pyautogui.moveRel(dr['x'] * 10, dr['y'] * 10, duration=self.dt)
+        # print(round(dr['dx'] * 10 ** 5), round(dr['dy'] * 10 ** 5))
+        # FIND BETTER SCALING FACTOR THAN 100!
+        # It moves, but there's too much noise and positional drift
+        # find way to better calculate this...
+        pyautogui.moveRel(round(dr['dx'] * 10 ** 6), round(dr['dy'] * 10 ** 6), duration=self.dt)
 
